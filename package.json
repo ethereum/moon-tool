@@ -1,0 +1,25 @@
+{
+  "name": "moon-tool",
+  "version": "0.2.2",
+  "description": "Command-lite tool for Moon-lang",
+  "main": "moon-tool.js",
+  "bin": {
+    "moon": "moon-tool.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/maiavictor/moon.git"
+  },
+  "author": "Victor Maia",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maiavictor/moon/issues"
+  },
+  "homepage": "https://github.com/maiavictor/moon#readme",
+  "dependencies": {
+    "moon-lang": "^0.2.2"
+  }
+}
