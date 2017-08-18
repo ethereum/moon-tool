@@ -2,7 +2,7 @@
 
 var fs = require("fs");
 var path = require("path");
-var Moon = require("moon-lang")("https://ipfs.infura.io:5001");
+var Moon = require("./../moon")("https://ipfs.infura.io:5001");
 var nodeIO = () => require("moon-lang/lib/moon-io-node.js");
 var performIO = program => Moon.performIO(program, nodeIO());
 var packageJson = require("./package.json");
@@ -38,6 +38,13 @@ var val = () => {
           (Moon.parse
           (await Moon.imports
           (await val())))));
+        process.exit();
+        break;
+
+      case "format":
+        console.log
+          (Moon.format
+          (await val()));
         process.exit();
         break;
 
