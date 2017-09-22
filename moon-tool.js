@@ -126,7 +126,9 @@ var val = () => {
           fs.writeFileSync(file, newContents);
           console.log(oldCid + " -> " + newCid + " (" + file + ")");
           const changedFiles = await find(oldCid);
-          await Promise.all(changedFiles.map(file => replace(file, oldCid, newCid)));
+          for (let i = 0; i < changedFiles.length; ++i) {
+            await replace(changedFiles[i], oldCid, newCid);
+          };
         };
 
         // Replaces single file, adjust imports
@@ -134,7 +136,10 @@ var val = () => {
           replace(args[1], fs.readFileSync(args[1], "utf8"), args[2]);
         // Search/replaces a regex, adjust imports
         } else {
-          (await find(args[1])).map(file => replace(file, args[1], args[2]));
+          const files = await find(args[1]);
+          for (let i = 0; i < files.length; ++i) {
+            await replace(files[i], args[1], args[2]);
+          };
         }
 
         break;
