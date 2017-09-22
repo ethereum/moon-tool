@@ -49,7 +49,7 @@ moon load zb2rhoKHTgNBYJDnzaBn8uaCpKuX9iGpsc2hpLdE2k2YTD1jH
 
 #### Updating IPFS imports:
 
-If you modify a file and save it to IPFS, all files that import it will keep using the old version, because Moon guarantees that a file's behavior doesn't change if its contents don't change. To amend that, `moon-tool` provides the replace command, which allows you to change the contents of a file, save it to IPFS and update all imports that refer to the old version. Example:
+If you modify a file and save it to IPFS, all files that import it will keep using the old version, because Moon guarantees that a file's behavior doesn't change if its contents don't change. This can be very annoying when you just want to update a file which is imported in many places. To amend that, `moon-tool` provides the replace command, which allows you to change the contents of a file, save it to IPFS and recursivelly update all imports that refer to the old version. Example:
 
 ```bash
 # creates a `helloworld.moon` file which imports a `hello.moon` file
@@ -74,7 +74,7 @@ $ moon run helloworld
 
 # Rewrites `hello.moon`'s contents
 
-$ moon replace $(cat hello.moon) "\"hola\""
+$ moon replace hello.moon "\"hola\""
 zb2rhfsstEj5riwMdMpKep4h1MmCXTzKYrucQJ6TEqRCRRxAw -> zb2rhf5uqM37QCXN8VMTXYPDA2XB2w1fwHzy91CjWovJmVGUW (hello.moon)
 zb2rhiNoCanP5qCJeePx5zEyp8EBp9tBgGrEmQJ1K7ZKNSena -> zb2rhkikpZPfJGvJJ2wyUSTe9W4zeKBJHuaSrfpFBpbH18M3N (helloworld.moon)
 
@@ -94,6 +94,14 @@ $ moon run helloworld
 
 # Notice `helloworld.moon` changed accourdingly.
 ```
+
+You can also replace arbitrary expressions:
+
+```
+moon replace "some_regex" "new_value"
+```
+
+Note `moon replace` modifies your files, so use it carefully.
 
 #### Running with side-effects:
 

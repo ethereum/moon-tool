@@ -14,7 +14,7 @@ var args = [].slice.call(process.argv, 2);
 
 var val = () => {
   var val = args[args.length - 1];
-  var file = path.join(process.cwd(), val + ".moon");
+  var file = path.join(process.cwd(), val.slice(-5) === ".moon" ? val : val + ".moon");
   if (fs.existsSync(file)) {
     val = fs.readFileSync(file, "utf8");
   }
@@ -125,15 +125,17 @@ var val = () => {
           const newCid = await Moon.save(newContents);
           fs.writeFileSync(file, newContents);
           console.log(oldCid + " -> " + newCid + " (" + file + ")");
-          rename(oldCid, newCid);
+          const changedFiles = await find(oldCid);
+          await Promise.all(changedFiles.map(file => replace(file, oldCid, newCid)));
         };
 
-        const rename = async (oldCid, newCid) => {
-          const files = await find(oldCid);
-          await Promise.all(files.map(file => replace(file, oldCid, newCid)));
-        };
-
-        rename(args[1], args[2]);
+        // Replaces single file, adjust imports
+        if (args[1].slice(-5) === ".moon") {
+          replace(args[1], fs.readFileSync(args[1], "utf8"), args[2]);
+        // Search/replaces a regex, adjust imports
+        } else {
+          (await find(args[1])).map(file => replace(file, args[1], args[2]));
+        }
 
         break;
 
@@ -142,17 +144,17 @@ var val = () => {
         console.log("");
         console.log("# Commands:");
         console.log("");
-        console.log("  moon run <expr/file>       -- runs an expr/file");
-        console.log("  moon pack <expr/file>      -- packs an expr/file to binary");
-        console.log("  moon unpack <expr/file>    -- unpacks a packed term");
-        console.log("  moon stringify <expr/file> -- displays an expr/file");
-        console.log("  moon compile <expr/file>   -- compiles an expr/file to JS");
-        console.log("  moon save <expr/file>      -- saves an expr/file to IPFS");
-        console.log("  moon load <expr/file>      -- loads an expr/file from IPFS");
-        console.log("  moon cid <expr/file>       -- gets the IPFS ID of an expr/file");
-        console.log("  moon imports <expr/file>   -- recursively imports an expr/file");
-        console.log("  moon version               -- prints the version");
-        console.log("  moon replace from to       -- recursive replace, readjusts imports");
+        console.log("  moon run <expr/file>         -- runs an expr/file");
+        console.log("  moon pack <expr/file>        -- packs an expr/file to binary");
+        console.log("  moon unpack <expr/file>      -- unpacks a packed term");
+        console.log("  moon stringify <expr/file>   -- displays an expr/file");
+        console.log("  moon compile <expr/file>     -- compiles an expr/file to JS");
+        console.log("  moon save <expr/file>        -- saves an expr/file to IPFS");
+        console.log("  moon load <expr/file>        -- loads an expr/file from IPFS");
+        console.log("  moon cid <expr/file>         -- gets the IPFS ID of an expr/file");
+        console.log("  moon imports <expr/file>     -- recursively imports an expr/file");
+        console.log("  moon version                 -- prints the version");
+        console.log("  moon replace <expr/file> val -- recursive replace, readjusts imports");
         console.log("");
         console.log("# Inline execution:");
         console.log("");
@@ -190,12 +192,16 @@ var val = () => {
         console.log("");
         console.log("# Import-aware recursive search/replace:");
         console.log("");
-        console.log("  moon replace $(cat file.moon) \"new_file_contents\"");
+        console.log("  moon replace file.moon \"new_file_contents\"");
         console.log("");
         console.log("  The command above replaces the contents of `file.moon`,");
         console.log("  saves it to IPFS, and recursivelly updates all files on");
-        console.log("  this directory tree that import the old version.");
+        console.log("  this directory-tree that import the old version. You can");
+        console.log("  also replace arbitrary strings instead of single files:");
         console.log("");
+        console.log("  moon replace \"2017\" \"2018\"");
+        console.log("");
+        console.log("  The replace command modifies your files. Use it carefully.");
     }
   } catch (e) {
     console.log(e);
