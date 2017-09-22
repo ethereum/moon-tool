@@ -1,6 +1,8 @@
 #!/usr/bin/env node --harmony-tailcalls
 
 var fs = require("fs");
+var util = require("util");
+var exec = util.promisify(require("child_process").exec);
 var path = require("path");
 var Moon = require("moon-lang")("https://ipfs.infura.io:5001");
 var nodeIO = () => require("moon-lang/lib/moon-io-node.js");
@@ -95,6 +97,46 @@ var val = () => {
         console.log(packageJson.version);
         break;
 
+      case "replace":
+        try {
+          await exec("which ag");
+        } catch (e) {
+          console.log("This command requires ag (the silver searcher) installed.");
+          break;
+        };
+
+        const find = async expr => {
+          try {
+            var files = await exec("ag '" + expr + "' -l");
+          } catch (e) {
+            var files = {stdout: ""};
+          }
+          return files
+            .stdout
+            .split("\n")
+            .slice(0,-1)
+            .map(file => path.join(".", file));
+        };
+
+        const replace = async (file, old, neo) => {
+          const oldContents = fs.readFileSync(file, "utf8");
+          const newContents = oldContents.replace(new RegExp(old,"g"), neo);
+          const oldCid = await Moon.cid(oldContents);
+          const newCid = await Moon.save(newContents);
+          fs.writeFileSync(file, newContents);
+          console.log(oldCid + " -> " + newCid + " (" + file + ")");
+          rename(oldCid, newCid);
+        };
+
+        const rename = async (oldCid, newCid) => {
+          const files = await find(oldCid);
+          await Promise.all(files.map(file => replace(file, oldCid, newCid)));
+        };
+
+        rename(args[1], args[2]);
+
+        break;
+
       default:
         console.log("Moon-Lang ☾");
         console.log("");
@@ -110,6 +152,7 @@ var val = () => {
         console.log("  moon cid <expr/file>       -- gets the IPFS ID of an expr/file");
         console.log("  moon imports <expr/file>   -- recursively imports an expr/file");
         console.log("  moon version               -- prints the version");
+        console.log("  moon replace from to       -- recursive replace, readjusts imports");
         console.log("");
         console.log("Examples:");
         console.log("");
