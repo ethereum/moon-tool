@@ -1,6 +1,6 @@
 {
   "name": "moon-tool",
-  "version": "0.2.22b",
+  "version": "0.2.22c",
   "description": "Command-lite tool for Moon-lang",
   "main": "moon-tool.js",
   "bin": {

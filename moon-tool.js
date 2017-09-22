@@ -140,7 +140,7 @@ var val = () => {
       default:
         console.log("Moon-Lang ☾");
         console.log("");
-        console.log("Commands:");
+        console.log("# Commands:");
         console.log("");
         console.log("  moon run <expr/file>       -- runs an expr/file");
         console.log("  moon pack <expr/file>      -- packs an expr/file to binary");
@@ -154,41 +154,47 @@ var val = () => {
         console.log("  moon version               -- prints the version");
         console.log("  moon replace from to       -- recursive replace, readjusts imports");
         console.log("");
-        console.log("Examples:");
+        console.log("# Inline execution:");
         console.log("");
-        console.log("  Inline execution:");
+        console.log("  moon run '(add 1 2)'        -- output: 3");
+        console.log("  moon run 'x=4 y=2 [x y]'    -- output: [4 2]");
+        console.log("  moon run '((x => [x x]) 3)' -- output: [3 3]");
         console.log("");
-        console.log("    moon run '(add 1 2)'        -- output: 3");
-        console.log("    moon run 'x=4 y=2 [x y]'    -- output: [4 2]");
-        console.log("    moon run '((x => [x x]) 3)' -- output: [3 3]");
+        console.log("# File execution:");
         console.log("");
-        console.log("  File execution:");
+        console.log("  echo '\"Hello\"' >> hi.moon");
+        console.log("  moon run hi -- output: \"Hello\"");  
         console.log("");
-        console.log("    echo '\"Hello\"' >> hi.moon");
-        console.log("    moon run hi -- output: \"Hello\"");  
+        console.log("# Saving to IPFS:");
         console.log("");
-        console.log("  Saving to IPFS:");
+        console.log("  moon save 'x => (add x 1)'");
         console.log("");
-        console.log("    moon save 'x => (add x 1)'");
+        console.log("  After you save an expression, you may use its hash inside");
+        console.log("  other expressions: `moon run` recursively imports IPFS hashes.");
         console.log("");
-        console.log("    After you save an expression, you may use its hash inside");
-        console.log("    other expressions: `moon run` recursively imports IPFS hashes.");
+        console.log("# Loading from IPFS:");
         console.log("");
-        console.log("  Loading from IPFS:");
+        console.log("  moon load zb2rhea5n8bErvkLE3fBgJjUd8noxXMunHUisVH4HhDxhSrMn");
         console.log("");
-        console.log("    moon load zb2rhea5n8bErvkLE3fBgJjUd8noxXMunHUisVH4HhDxhSrMn");
+        console.log("# Running with side-effects:");
         console.log("");
-        console.log("  Running with side-effects:");
+        console.log("  moon runIO 'ask => end => (ask \"prompt\" \"Hi!\" then => (end 0))'")
         console.log("");
-        console.log("    moon runIO 'ask => end => (ask \"prompt\" \"Hi!\" then => (end 0))'")
+        console.log("  Moon is pure, but you can still peform side-effects by");
+        console.log("  evaluating computations in a side-effective language.");
+        console.log("  The `runIO` command does that with default side-effects.");
         console.log("");
-        console.log("    Moon is pure, but you can still peform side-effects by");
-        console.log("    evaluating computations in a side-effective language.");
-        console.log("    The `runIO` command does that with default side-effects.");
+        console.log("# Compiling to JavaScript:");
         console.log("");
-        console.log("  Compiling to JavaScript:");
+        console.log("   moon compile 'x => (mul x 10)'");
         console.log("");
-        console.log("     moon compile 'x => (mul x 10)'");
+        console.log("# Import-aware recursive search/replace:");
+        console.log("");
+        console.log("  moon replace $(cat file.moon) \"new_file_contents\"");
+        console.log("");
+        console.log("  The command above replaces the contents of `file.moon`,");
+        console.log("  saves it to IPFS, and recursivelly updates all files on");
+        console.log("  this directory tree that import the old version.");
         console.log("");
     }
   } catch (e) {
