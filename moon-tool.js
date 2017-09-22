@@ -4,13 +4,26 @@ var fs = require("fs");
 var util = require("util");
 var exec = util.promisify(require("child_process").exec);
 var path = require("path");
-var Moon = require("moon-lang")("https://ipfs.infura.io:5001");
+var Moon = require("moon-lang");
 var nodeIO = () => require("moon-lang/lib/moon-io-node.js");
 var performIO = program => Moon.performIO(program, nodeIO());
 var packageJson = require("./package.json");
 
-// Gets the command line arguments
+// Gets the command line arguments and options
 var args = [].slice.call(process.argv, 2);
+var opts = {};
+loop: while (1) {
+  switch (args[0]) {
+    case "--ipfs-url":
+      opts["ipfs-url"] = args[1];
+      args.splice(0, 2);
+      break;
+    default:
+      break loop;
+  }
+}
+
+var moon = Moon(opts["ipfs-url"] || "https://ipfs.infura.io:5001");
 
 var val = () => {
   var val = args[args.length - 1];
@@ -28,68 +41,68 @@ var val = () => {
     switch ((args[0]||"").toLowerCase()) {
       case "run":
         console.log
-          (Moon.run
-          (await Moon.imports
+          (moon.run
+          (await moon.imports
           (await val())));
         break;
 
       case "runio":
         console.log
-          (Moon.stringify
+          (moon.stringify
           (await performIO
-          (Moon.parse
-          (await Moon.imports
+          (moon.parse
+          (await moon.imports
           (await val())))));
         process.exit();
         break;
 
       case "format":
         console.log
-          (Moon.format
+          (moon.format
           (await val()));
         process.exit();
         break;
 
       case "pack":
         console.log
-          (Moon.pack
+          (moon.pack
           (await val()));
         break;
 
       case "unpack":
         console.log
-          (Moon.unpack
+          (moon.unpack
           (await val()));
         break;
         
       case "compile":
         console.log
-          (Moon.compile
-          (await Moon.imports
+          (moon.compile
+          (await moon.imports
           (await val())));
         break;
         
       case "save":
         console.log
-          (await Moon.save
+          (await moon.save
           (await val()));
         break;
 
       case "load":
         console.log
-          (await Moon.load
+          (await moon.load
           (await val()));
         break;
 
       case "imports":
         console.log
-          (await Moon.imports
+          (await moon.imports
           (await val()));
         break;
 
       case "cid":
         console.log
-          (await Moon.cid
+          (await moon.cid
           (await val()));
         break;
 
@@ -121,8 +134,8 @@ var val = () => {
         const replace = async (file, old, neo) => {
           const oldContents = fs.readFileSync(file, "utf8");
           const newContents = oldContents.replace(new RegExp(old,"g"), neo);
-          const oldCid = await Moon.cid(oldContents);
-          const newCid = await Moon.save(newContents);
+          const oldCid = await moon.cid(oldContents);
+          const newCid = await moon.save(newContents);
           fs.writeFileSync(file, newContents);
           console.log(oldCid + " -> " + newCid + " (" + file + ")");
           const changedFiles = await find(oldCid);
@@ -146,6 +159,11 @@ var val = () => {
 
       default:
         console.log("Moon-Lang ☾");
+        console.log("");
+        console.log("");
+        console.log("# Options:");
+        console.log("");
+        console.log("  --ipfs-url <url>             -- IPFS url. Default: Infura");
         console.log("");
         console.log("# Commands:");
         console.log("");
