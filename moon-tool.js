@@ -6,7 +6,6 @@ var exec = util.promisify(require("child_process").exec);
 var path = require("path");
 var Moon = require("moon-lang");
 var nodeIO = () => require("moon-lang/lib/moon-io-node.js");
-var performIO = program => Moon.performIO(program, nodeIO());
 var packageJson = require("./package.json");
 
 // Gets the command line arguments and options
@@ -24,6 +23,7 @@ loop: while (1) {
 }
 
 var moon = Moon(opts["ipfs-url"] || "https://ipfs.infura.io:5001");
+var performIO = program => moon.performIO(program, nodeIO());
 
 var val = () => {
   var val = args[args.length - 1];
