@@ -47,12 +47,11 @@ var val = () => {
         break;
 
       case "runio":
-        console.log
-          (moon.stringify
-          (await performIO
-          (moon.parse
-          (await moon.imports
-          (await val())))));
+        (moon.stringify
+        (await performIO
+        (moon.parse
+        (await moon.imports
+        (await val())))));
         process.exit();
         break;
 
