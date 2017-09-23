@@ -1,6 +1,6 @@
 {
   "name": "moon-tool",
-  "version": "0.2.24",
+  "version": "0.2.25",
   "description": "Command-lite tool for Moon-lang",
   "main": "moon-tool.js",
   "bin": {
@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/maiavictor/moon#readme",
   "dependencies": {
-    "moon-lang": "^0.2.24"
+    "moon-lang": "^0.2.25"
   }
 }
